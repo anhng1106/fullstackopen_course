@@ -13,10 +13,17 @@ const App = () => {
   ];
 
   const [selected, setSelected] = useState(0);
+  const [votes, setVotes] = useState(new Array(anecdotes.length).fill(0));
   // const handleNextAnecdote = () => {
   //   const nextIndex = Math.floor(Math.random() * anecdotes.length);
   //   setSelected(nextIndex);
   // };
+
+  const handleVote = () => {
+    const newVotes = [...votes];
+    newVotes[selected] += 1;
+    setVotes(newVotes);
+  };
 
   const handleNextAnecdote = () => {
     const nextIndex = (selected + 1) % anecdotes.length;
@@ -29,6 +36,8 @@ const App = () => {
 
       <button onClick={handleNextAnecdote}>Next Anecdote</button>
       <p>{anecdotes[selected]}</p>
+      <p>has {votes[selected]} votes</p>
+      <button onClick={handleVote}>vote</button>
     </div>
   );
 };
