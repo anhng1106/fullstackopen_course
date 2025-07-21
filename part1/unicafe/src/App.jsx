@@ -3,9 +3,10 @@ import React from "react";
 
 function StatisticLine({ label, value }) {
   return (
-    <p>
-      {label} {value}
-    </p>
+    <tr>
+      <td>{label}</td>
+      <td>{value}</td>
+    </tr>
   );
 }
 
@@ -26,14 +27,16 @@ function Statistics({ good, neutral, bad }) {
     return <p>No feedback given</p>;
   } else {
     return (
-      <>
-        <StatisticLine label="good" value={good} />
-        <StatisticLine label="neutral" value={neutral} />
-        <StatisticLine label="bad" value={bad} />
-        <StatisticLine label="all" value={total} />
-        <StatisticLine label="average" value={average.toFixed(2)} />
-        <StatisticLine label="positive" value={`${positive.toFixed(2)} %`} />
-      </>
+      <table>
+        <tbody>
+          <StatisticLine label="good" value={good} />
+          <StatisticLine label="neutral" value={neutral} />
+          <StatisticLine label="bad" value={bad} />
+          <StatisticLine label="all" value={total} />
+          <StatisticLine label="average" value={average.toFixed(2)} />
+          <StatisticLine label="positive" value={`${positive.toFixed(2)} %`} />
+        </tbody>
+      </table>
     );
   }
 }
