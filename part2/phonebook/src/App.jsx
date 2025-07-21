@@ -10,6 +10,9 @@ const App = () => {
     if (newName.trim() === "") {
       alert("Name cannot be empty");
       return;
+    }
+    if (persons.some((person) => person.name === newName)) {
+      alert(`${newName} is already added to phonebook`);
     } else {
       const personObject = { name: newName };
       setPersons(persons.concat(personObject));
