@@ -1,11 +1,12 @@
-const Notification = ({ message }) => {
+const Notification = ({ message, type }) => {
   if (!message) return null;
+  console.log("Message:", message, "Type:", type);
 
   const style = {
-    color: "green",
+    color: type === "success" ? "green" : "red",
     background: "lightgrey",
     fontSize: 20,
-    border: "2px solid green",
+    border: `2px solid ${type === "success" ? "green" : "red"}`,
     borderRadius: 5,
     padding: 10,
     marginBottom: 15,

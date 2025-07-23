@@ -12,6 +12,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState("");
   const [filter, setFilter] = useState("");
   const [message, setMessage] = useState(null);
+  const [messageType, setMessageType] = useState(null);
 
   useEffect(() => {
     personService.getAll().then((initialPersons) => {
@@ -21,8 +22,8 @@ const App = () => {
 
   const handleAddPerson = (event) => {
     event.preventDefault();
-    if ((newName && newNumber).trim() === "") {
-      alert("Name and number cannot be empty");
+    if (newName.trim() === "" || newNumber.trim() === "") {
+      alert("Both name and number are required.");
       return;
     }
 
@@ -45,14 +46,21 @@ const App = () => {
             );
             setNewNumber("");
             setMessage(`Updated ${returnedPerson.name}`);
+            setMessageType("success");
             setTimeout(() => {
               setMessage(null);
+              setMessageType(null);
             }, 5000);
           })
           .catch((error) => {
-            alert(
+            setMessage(
               `The person ${existingPerson.name} has already been removed from server`
             );
+            setMessageType("error");
+            setTimeout(() => {
+              setMessage(null);
+              setMessageType(null);
+            }, 5000);
             setPersons(
               persons.filter((person) => person.id !== existingPerson.id)
             );
@@ -68,8 +76,10 @@ const App = () => {
         setNewName("");
         setNewNumber("");
         setMessage(`Added ${returnedPerson.name}`);
+        setMessageType("success");
         setTimeout(() => {
           setMessage(null);
+          setMessageType(null);
         }, 5000);
       });
     }
@@ -94,7 +104,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={message} />
+      <Notification message={message} type={messageType} />
       <Filter value={filter} onChange={handleFilterChange} />
 
       <h2>Add a new</h2>
