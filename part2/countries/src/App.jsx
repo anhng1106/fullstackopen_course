@@ -1,21 +1,29 @@
 import React, { useState, useEffect, use } from "react";
-import axios from "axios";
 import CountryDetails from "./components/CountryDetails";
+import countryService from "./services/countryService";
 
 function App() {
   const [countries, setCountries] = useState([]);
   const [search, setSearch] = useState("");
+  const [selectedCountry, setSelectedCountry] = useState(null);
 
   useEffect(() => {
-    axios
-      .get("https://studies.cs.helsinki.fi/restcountries/api/all")
-      .then((response) => {
-        setCountries(response.data);
-      });
+    countryService.getAll().then((countries) => {
+      setCountries(countries);
+      setSelectedCountry(null);
+    });
   }, []);
+  // useEffect(() => {
+  //   axios
+  //     .get("https://studies.cs.helsinki.fi/restcountries/api/all")
+  //     .then((response) => {
+  //       setCountries(response.data);
+  //     });
+  // }, []);
 
   const handleSearchChange = (event) => {
     setSearch(event.target.value);
+    setSelectedCountry(null);
   };
 
   const filteredCountries = countries.filter((country) =>
@@ -31,16 +39,25 @@ function App() {
       <div>
         {search === " " ? null : filteredCountries.length > 10 ? (
           <p>Too many matches, specify another filter</p>
-        ) : filteredCountries.length > 1 ? (
-          filteredCountries.map((country) => (
-            <p key={country.cca3}>{country.name.common}</p>
-          ))
         ) : filteredCountries.length === 1 ? (
           <CountryDetails country={filteredCountries[0]} />
+        ) : selectedCountry ? (
+          <CountryDetails country={selectedCountry} />
         ) : (
-          <p>No matches found</p>
+          filteredCountries.map((country) => (
+            <p key={country.cca3}>
+              {country.name.common}{" "}
+              <button onClick={() => setSelectedCountry(country)}>Show</button>
+            </p>
+          ))
         )}
       </div>
+      {/* if (search === '') return null;
+          if (filtered.length > 10) return <p>Too many matches</p>;
+          if (filtered.length === 1) return <CountryDetails country={filtered[0]} />;
+          if (selectedCountry) return <CountryDetails country={selectedCountry} />;
+
+          return filtered.map(...); */}
     </>
   );
 }
