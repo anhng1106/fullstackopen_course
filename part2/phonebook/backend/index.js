@@ -59,6 +59,36 @@ app.get("/info", (request, response) => {
   );
 });
 
+const generateId = () => {
+  const id = Math.floor(Math.random() * 1000000).toString();
+  return id;
+};
+
+app.post("/api/persons", (request, response) => {
+  const body = request.body;
+
+  if (!body.name || !body.number) {
+    return response.status(400).json({
+      error: "name or number is missing",
+    });
+  }
+
+  const nameExists = persons.some((person) => person.name === body.name);
+  if (nameExists) {
+    return response.status(400).json({ error: "name must be unique" });
+  }
+
+  const person = {
+    name: body.name,
+    number: body.number,
+    id: generateId(),
+  };
+
+  persons = persons.concat(person);
+
+  response.json(person);
+});
+
 const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
