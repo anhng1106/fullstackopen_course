@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/anhng1106/fullstackopen_course#readme",
   "dependencies": {
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "morgan": "^1.10.1"
   }
 }
