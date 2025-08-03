@@ -71,17 +71,30 @@ const App = () => {
         name: newName,
         number: newNumber,
       };
-      personService.create(newPerson).then((returnedPerson) => {
-        setPersons(persons.concat(returnedPerson));
-        setNewName("");
-        setNewNumber("");
-        setMessage(`Added ${returnedPerson.name}`);
-        setMessageType("success");
-        setTimeout(() => {
-          setMessage(null);
-          setMessageType(null);
-        }, 5000);
-      });
+      personService
+        .create(newPerson)
+        .then((returnedPerson) => {
+          setPersons(persons.concat(returnedPerson));
+          setNewName("");
+          setNewNumber("");
+          setMessage(`Added ${returnedPerson.name}`);
+          setMessageType("success");
+          setTimeout(() => {
+            setMessage(null);
+            setMessageType(null);
+          }, 5000);
+        })
+        .catch((error) => {
+          console.error("Error adding person:", error.response.data.error);
+          setMessage(error.response.data.error);
+          setMessageType("error");
+          setTimeout(() => {
+            setMessage(null);
+            setMessageType(null);
+          }, 5000);
+          setNewName("");
+          setNewNumber("");
+        });
     }
   };
 

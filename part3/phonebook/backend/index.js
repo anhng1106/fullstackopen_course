@@ -8,6 +8,7 @@ const Person = require("./models/person");
 const app = express();
 
 app.use(express.json());
+app.use(express.static("build"));
 
 morgan.token("body", (request) => {
   return request.method === "POST" ? JSON.stringify(request.body) : "";
@@ -58,7 +59,7 @@ app.get("/info", (req, res) => {
   });
 });
 
-app.post("/api/persons", (request, response) => {
+app.post("/api/persons", (request, response, next) => {
   const body = request.body;
 
   if (!body.name || !body.number) {
