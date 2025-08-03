@@ -1,6 +1,9 @@
+require("dotenv").config();
+
 const morgan = require("morgan");
 const express = require("express");
 const cors = require("cors");
+const Person = require("./models/person");
 
 const app = express();
 
@@ -44,32 +47,36 @@ app.get("/", (request, response) => {
 });
 
 app.get("/api/persons", (request, response) => {
-  response.json(persons);
+  Person.find({}).then((result) => {
+    response.json(result);
+  });
 });
 
-app.get("/api/persons/:id", (request, response) => {
-  const id = request.params.id;
-  const person = persons.find((person) => person.id === id);
-  if (person) {
-    response.json(person);
-  } else {
-    response.status(404).send({ error: "Person not found" });
-  }
+app.get("/api/persons/:id", (request, response, next) => {
+  Person.findById(request.params.id)
+    .then((person) => {
+      if (person) {
+        response.json(person);
+      } else {
+        response.status(404).send({ error: "Person not found" });
+      }
+    })
+    .catch((error) => next(error));
 });
 
-app.delete("/api/persons/:id", (request, response) => {
-  const id = request.params.id;
-  persons = persons.filter((person) => person.id !== id);
-  response.status(204).end();
+app.delete("/api/persons/:id", (request, response, next) => {
+  Person.findByIdAndDelete(request.params.id)
+    .then(() => response.status(204).end())
+    .catch((error) => next(error));
 });
 
-app.get("/info", (request, response) => {
-  const total = persons.length;
-  const currentTime = new Date();
-
-  response.send(
-    `<p>Phonebook has info for ${total} people</p><p>${currentTime}</p>`
-  );
+app.get("/info", (req, res) => {
+  Person.countDocuments().then((count) => {
+    res.send(`
+      <p>Phonebook has info for ${count} people</p>
+      <p>${new Date()}</p>
+    `);
+  });
 });
 
 const generateId = () => {
@@ -91,18 +98,19 @@ app.post("/api/persons", (request, response) => {
     return response.status(400).json({ error: "name must be unique" });
   }
 
-  const person = {
+  const person = new Person({
     name: body.name,
     number: body.number,
     id: generateId(),
-  };
+  });
 
-  persons = persons.concat(person);
-
-  response.json(person);
+  person.save().then((savedPerson) => {
+    console.log("person saved:", savedPerson);
+    response.json(savedPerson);
+  });
 });
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
