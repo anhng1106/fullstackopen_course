@@ -1,0 +1,6 @@
+PUT http://localhost:3001/api/persons/3
+
+{
+    "name": "Updated Name",
+    "number": "123-456-7890"
+}
