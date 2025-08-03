@@ -7,29 +7,6 @@ const Person = require("./models/person");
 
 const app = express();
 
-let persons = [
-  {
-    id: "1",
-    name: "Arto Hellas",
-    number: "040-123456",
-  },
-  {
-    id: "2",
-    name: "Ada Lovelace",
-    number: "39-44-5323523",
-  },
-  {
-    id: "3",
-    name: "Dan Abramov",
-    number: "12-43-234345",
-  },
-  {
-    id: "4",
-    name: "Mary Poppendieck",
-    number: "39-23-6423122",
-  },
-];
-
 app.use(express.json());
 
 morgan.token("body", (request) => {
@@ -79,11 +56,6 @@ app.get("/info", (req, res) => {
   });
 });
 
-const generateId = () => {
-  const id = Math.floor(Math.random() * 1000000).toString();
-  return id;
-};
-
 app.post("/api/persons", (request, response) => {
   const body = request.body;
 
@@ -93,21 +65,18 @@ app.post("/api/persons", (request, response) => {
     });
   }
 
-  const nameExists = persons.some((person) => person.name === body.name);
-  if (nameExists) {
-    return response.status(400).json({ error: "name must be unique" });
-  }
-
   const person = new Person({
     name: body.name,
     number: body.number,
-    id: generateId(),
   });
 
-  person.save().then((savedPerson) => {
-    console.log("person saved:", savedPerson);
-    response.json(savedPerson);
-  });
+  person
+    .save()
+    .then((savedPerson) => {
+      console.log("person saved:", savedPerson);
+      response.json(savedPerson);
+    })
+    .catch((error) => next(error));
 });
 
 const PORT = process.env.PORT;
