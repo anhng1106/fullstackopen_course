@@ -22,4 +22,12 @@ const blogsInDb = async () => {
   return blogs.map((b) => b.toJSON());
 };
 
-module.exports = { initialBlogs, blogsInDb };
+const nonExistingId = async () => {
+  const tmp = new Blog({ title: "to-remove", author: "tmp", url: "http://x" });
+  const saved = await tmp.save();
+  const id = saved._id.toString();
+  await Blog.findByIdAndDelete(id);
+  return id;
+};
+
+module.exports = { initialBlogs, blogsInDb, nonExistingId };

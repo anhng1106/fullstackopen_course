@@ -122,6 +122,39 @@ test("fails with 400 if url is missing", async () => {
   assert.equal(blogsAtEnd.length, blogsAtStart.length);
 });
 
+test("deleting a blog succeeds with status 204 and removes it", async () => {
+  const start = await helper.blogsInDb();
+  const blogToDelete = start[0];
+
+  await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+
+  const end = await helper.blogsInDb();
+  assert.equal(end.length, start.length - 1);
+
+  const ids = end.map((b) => b.id);
+  assert.ok(!ids.includes(blogToDelete.id));
+});
+
+test("updating likes of a blog succeeds and returns updated blog", async () => {
+  const start = await helper.blogsInDb();
+  const target = start[0];
+
+  const updatedPayload = { ...target, likes: (target.likes || 0) + 10 };
+
+  const res = await api
+    .put(`/api/blogs/${target.id}`)
+    .send(updatedPayload)
+    .expect(200)
+    .expect("Content-Type", /application\/json/);
+
+  assert.equal(res.body.id, target.id);
+  assert.equal(res.body.likes, (target.likes || 0) + 10);
+
+  const end = await helper.blogsInDb();
+  const updated = end.find((b) => b.id === target.id);
+  assert.equal(updated.likes, (target.likes || 0) + 10);
+});
+
 after(async () => {
   await mongoose.connection.close();
 });
