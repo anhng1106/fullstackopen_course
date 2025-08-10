@@ -24,40 +24,59 @@ blogRouter.get("/", async (req, res, next) => {
   }
 });
 
-blogRouter.post("/", userExtractor, async (request, response, next) => {
-  const body = request.body;
-  const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET);
-  if (!decodedToken.id) {
-    return response.status(401).json({ error: "token invalid" });
+blogRouter.post("/", userExtractor, async (req, res, next) => {
+  try {
+    const { title, author, url, likes } = req.body;
+
+    if (!title || !url) {
+      return res.status(400).json({ error: "title and url are required" });
+    }
+
+    const user = req.user;
+    if (!user) {
+      return res.status(401).json({ error: "token missing or invalid" });
+    }
+
+    const blog = new Blog({
+      title,
+      author,
+      url,
+      likes,
+      user: user._id,
+    });
+
+    const saved = await blog.save();
+
+    user.blogs = user.blogs.concat(saved._id);
+    await user.save();
+
+    const populated = await saved.populate("user", { username: 1, name: 1 });
+    return res.status(201).json(populated);
+  } catch (error) {
+    next(error);
   }
-  const user = await User.findById(decodedToken.id);
-
-  if (!user) {
-    return response.status(400).json({ error: "UserId missing or not valid" });
-  }
-
-  const blog = new Blog({
-    title: body.title,
-    author: body.author,
-    url: body.url,
-    likes: body.likes || 0,
-    user: user._id,
-  });
-
-  const savedBlog = await blog.save();
-  user.blogs = user.blogs.concat(savedBlog._id);
-  await user.save();
-
-  response.status(201).json(savedBlog);
 });
 
-blogRouter.delete("/:id", async (req, res, next) => {
+blogRouter.delete("/:id", userExtractor, async (req, res, next) => {
   try {
-    const deleted = await Blog.findByIdAndDelete(req.params.id);
-    if (!deleted) return res.status(404).json({ error: "blog not found" });
-    res.status(204).end();
-  } catch (err) {
-    next(err);
+    const blog = await Blog.findById(req.params.id);
+    if (!blog) return res.status(404).json({ error: "blog not found" });
+
+    // blog.user might be an ObjectId or a populated object
+    const ownerId = blog.user && blog.user._id ? blog.user._id : blog.user; // handles both cases
+
+    if (!ownerId || ownerId.toString() !== req.user._id.toString()) {
+      return res
+        .status(403)
+        .json({ error: "only the creator can delete this blog" });
+    }
+
+    await Blog.findByIdAndDelete(blog._id);
+    await User.updateOne({ _id: req.user._id }, { $pull: { blogs: blog._id } });
+
+    return res.status(204).end();
+  } catch (error) {
+    next(error);
   }
 });
 

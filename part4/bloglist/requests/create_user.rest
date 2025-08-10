@@ -23,8 +23,20 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFsaWNlIiwiaWQiOiI2ODk4ZWY0MDYxOWI4OGZjOTkzZjU2OGEiLCJpYXQiOjE3NTQ4NTM3NDZ9.6Pol3coOCRNO0qJAAL8fN03nIDRDYFLBKU6PZGGIdkk
 
 {
-  "title": "Its me Alice!!!",
-  "author": "Alice",
-  "url": "http://example.com/my-first-blog-post",
-  "likes": 10
+  "title": "Daily work",
+  "author": "Alice-yummy",
+  "url": "https://example.com/dailyyy",
+  "likes": 4
 }
+
+
+### delete (as creator) -> 204
+DELETE http://localhost:3003/api/blogs/6898f227065cef081cf3d7b3
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFsaWNlIiwiaWQiOiI2ODk4ZWY0MDYxOWI4OGZjOTkzZjU2OGEiLCJpYXQiOjE3NTQ4NTQ2MTN9.FFKcVe2S_zscBuI1QnxAW9_aR8uyAUSI2Byj1UGk4hM
+
+### delete without token -> 401 (from userExtractor)
+DELETE http://localhost:3003/api/blogs/6898f227065cef081cf3d7b3
+
+### delete as non-creator -> 403
+DELETE http://localhost:3003/api/blogs/6898f227065cef081cf3d7b3
+Authorization: Bearer EyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFsaWNlIiwiaWQiOiI2ODk4ZWY0MDYxOWI4OGZjOTkzZjU2OGEiLCJpYXQiOjE3NTQ4NTQ2MTN9.FFKcVe2S_zscBuI1QnxAW9_aR8uyAUSI2Byj1UGk4hM
