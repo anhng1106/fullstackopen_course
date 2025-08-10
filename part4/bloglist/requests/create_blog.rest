@@ -1,9 +1,11 @@
+### create a blog (creator = first user in DB)
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
+Authorization: Bearer <your_actual_jwt_token_here>
 
 {
-  "title": "My Second Blog",
-  "author": "Mia",
-  "url": "http://example2.com/blog2",
-  "likes": 13
+  "title": "JWT-secured post",
+  "author": "Alice",
+  "url": "https://example.com/jwt",
+  "likes": 1
 }
